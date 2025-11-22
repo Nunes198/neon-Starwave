@@ -1,0 +1,183 @@
+/* Neon Starwave - Estilos */
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
+
+body {
+    margin: 0;
+    overflow: hidden;
+    background-color: #050505;
+    color: #fff;
+    font-family: 'Orbitron', sans-serif;
+    touch-action: none;
+    user-select: none;
+}
+
+canvas {
+    display: block;
+    box-shadow: inset 0 0 100px rgba(0, 255, 255, 0.1);
+}
+
+#ui-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+#score-board {
+    padding: 20px;
+    font-size: 24px;
+    text-shadow: 0 0 10px #0ff;
+    color: #0ff;
+}
+
+.screen {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    pointer-events: auto;
+    transition: opacity 0.3s;
+    z-index: 10;
+}
+
+.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+h1 {
+    font-size: 4rem;
+    margin: 0 0 20px 0;
+    color: #fff;
+    text-transform: uppercase;
+    text-shadow: 0 0 20px #0ff, 0 0 40px #00f;
+    text-align: center;
+    line-height: 1;
+}
+
+p {
+    font-size: 1.2rem;
+    color: #ccc;
+    margin-bottom: 40px;
+    text-align: center;
+    max-width: 600px;
+}
+
+button.btn-start {
+    background: transparent;
+    color: #0ff;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.5rem;
+    padding: 15px 40px;
+    border: 2px solid #0ff;
+    border-radius: 5px;
+    cursor: pointer;
+    text-shadow: 0 0 10px #0ff;
+    box-shadow: 0 0 10px #0ff, inset 0 0 10px #0ff;
+    transition: all 0.2s;
+    text-transform: uppercase;
+}
+
+button.btn-start:hover {
+    background: #0ff;
+    color: #000;
+    box-shadow: 0 0 30px #0ff, inset 0 0 20px #0ff;
+}
+
+#mobile-controls {
+    position: absolute;
+    bottom: 20px;
+    left: 0;
+    width: 100%;
+    height: 150px;
+    pointer-events: none;
+    display: none;
+    padding: 0 20px;
+    box-sizing: border-box;
+}
+
+@media (hover: none) and (pointer: coarse) {
+    #mobile-controls {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+    }
+    h1 { font-size: 2.5rem; }
+}
+
+.d-pad {
+    position: relative;
+    width: 180px;
+    height: 120px;
+    pointer-events: none;
+}
+
+.d-pad .control-btn {
+    position: absolute;
+    width: 50px;
+    height: 50px;
+    pointer-events: auto;
+}
+
+#btn-up { top: 0; left: 60px; }
+#btn-down { bottom: 0; left: 60px; }
+#btn-left { top: 35px; left: 0; }
+#btn-right { top: 35px; right: 0; }
+
+.control-group {
+    pointer-events: auto;
+    display: flex;
+    gap: 15px;
+    align-items: flex-end;
+    padding-bottom: 10px;
+}
+
+.control-btn {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    user-select: none;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.control-btn:active, .control-btn.active {
+    background: rgba(0, 255, 255, 0.3);
+    border-color: #0ff;
+    color: #fff;
+}
+
+.btn-large {
+    width: 80px;
+    height: 80px;
+    border-color: rgba(255, 50, 50, 0.3);
+}
+.btn-large:active, .btn-large.active {
+    background: rgba(255, 50, 50, 0.3);
+    border-color: #f00;
+}
+
+/* Cursor e botão desktop */
+@media (hover: hover) and (pointer: fine) {
+    #desktop-shoot { display: block !important; }
+    #desktop-cursor { display: block !important; }
+    #mobile-controls { display: none !important; }
+}
