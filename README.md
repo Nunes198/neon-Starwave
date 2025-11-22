@@ -19,7 +19,7 @@ Jogo arcade de nave espacial com visual neon!
 
 ## Como rodar
 
-Abra o arquivo `main.html` em seu navegador favorito (Chrome, Firefox, Safari, etc).
+Abra o arquivo `index.html` em seu navegador favorito (Chrome, Firefox, Safari, etc).
 
 ## Sobre
 
