@@ -1,5 +1,4 @@
 // Neon Starwave - Código principal
-// Todo o JavaScript do jogo foi movido para este arquivo
 
 // --- Configuração Básica ---
 const canvas = document.getElementById('gameCanvas');
@@ -32,23 +31,123 @@ if (desktopCursor) {
 }
 // --- Música de Introdução ---
 let introAudioCtx, introGain, introOsc;
+let gameAudioCtx, gameGain, gameOsc;
+let overAudioCtx, overGain, overOsc;
+// Música de introdução épica (sintetizada)
 function playIntroMusic() {
     if (!introAudioCtx) introAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
     introGain = introAudioCtx.createGain();
-    introOsc = introAudioCtx.createOscillator();
-    introOsc.type = 'sine';
-    introOsc.frequency.setValueAtTime(220, introAudioCtx.currentTime);
-    introOsc.frequency.linearRampToValueAtTime(440, introAudioCtx.currentTime + 2);
-    introGain.gain.setValueAtTime(0.15, introAudioCtx.currentTime);
-    introOsc.connect(introGain);
+    introGain.gain.setValueAtTime(0.12, introAudioCtx.currentTime);
     introGain.connect(introAudioCtx.destination);
-    introOsc.start();
+
+    // Camada de baixo
+    const bass = introAudioCtx.createOscillator();
+    bass.type = 'sawtooth';
+    bass.frequency.setValueAtTime(65, introAudioCtx.currentTime);
+    bass.frequency.linearRampToValueAtTime(80, introAudioCtx.currentTime + 2);
+    bass.connect(introGain);
+    bass.start();
+    bass.stop(introAudioCtx.currentTime + 4);
+
+    // Camada de melodia
+    const melody = introAudioCtx.createOscillator();
+    melody.type = 'triangle';
+    melody.frequency.setValueAtTime(220, introAudioCtx.currentTime);
+    melody.frequency.linearRampToValueAtTime(330, introAudioCtx.currentTime + 2);
+    melody.connect(introGain);
+    melody.start(introAudioCtx.currentTime + 0.5);
+    melody.stop(introAudioCtx.currentTime + 4);
+
+    // Camada de harmonia
+    const harmony = introAudioCtx.createOscillator();
+    harmony.type = 'square';
+    harmony.frequency.setValueAtTime(110, introAudioCtx.currentTime);
+    harmony.frequency.linearRampToValueAtTime(165, introAudioCtx.currentTime + 2);
+    harmony.connect(introGain);
+    harmony.start(introAudioCtx.currentTime + 1);
+    harmony.stop(introAudioCtx.currentTime + 4);
+
+    // Guardar para parar depois
+    introOsc = [bass, melody, harmony];
+}
+
+function playGameMusic() {
+    if (!gameAudioCtx) gameAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    gameGain = gameAudioCtx.createGain();
+    gameGain.gain.setValueAtTime(0.10, gameAudioCtx.currentTime);
+    gameGain.connect(gameAudioCtx.destination);
+
+    // Batida rítmica
+    const beat = gameAudioCtx.createOscillator();
+    beat.type = 'square';
+    beat.frequency.setValueAtTime(120, gameAudioCtx.currentTime);
+    beat.frequency.linearRampToValueAtTime(90, gameAudioCtx.currentTime + 2);
+    beat.connect(gameGain);
+    beat.start();
+    beat.stop(gameAudioCtx.currentTime + 999);
+
+    // Melodia simples
+    const melody = gameAudioCtx.createOscillator();
+    melody.type = 'triangle';
+    melody.frequency.setValueAtTime(330, gameAudioCtx.currentTime);
+    melody.frequency.linearRampToValueAtTime(440, gameAudioCtx.currentTime + 2);
+    melody.connect(gameGain);
+    melody.start(gameAudioCtx.currentTime + 0.5);
+    melody.stop(gameAudioCtx.currentTime + 999);
+
+    gameOsc = [beat, melody];
+}
+
+function stopGameMusic() {
+    if (gameOsc && Array.isArray(gameOsc)) {
+        gameOsc.forEach(osc => { try { osc.stop(); osc.disconnect(); } catch(e){} });
+        gameOsc = null;
+    }
+    if (gameGain) { gameGain.disconnect(); gameGain = null; }
+    if (gameAudioCtx) { gameAudioCtx.close(); gameAudioCtx = null; }
+}
+
+function playOverMusic() {
+    if (!overAudioCtx) overAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    overGain = overAudioCtx.createGain();
+    overGain.gain.setValueAtTime(0.13, overAudioCtx.currentTime);
+    overGain.connect(overAudioCtx.destination);
+
+    // Som dramático
+    const overOsc1 = overAudioCtx.createOscillator();
+    overOsc1.type = 'sawtooth';
+    overOsc1.frequency.setValueAtTime(220, overAudioCtx.currentTime);
+    overOsc1.frequency.linearRampToValueAtTime(80, overAudioCtx.currentTime + 2);
+    overOsc1.connect(overGain);
+    overOsc1.start();
+    overOsc1.stop(overAudioCtx.currentTime + 2.5);
+
+    // Som de "queda"
+    const overOsc2 = overAudioCtx.createOscillator();
+    overOsc2.type = 'triangle';
+    overOsc2.frequency.setValueAtTime(440, overAudioCtx.currentTime);
+    overOsc2.frequency.linearRampToValueAtTime(60, overAudioCtx.currentTime + 2);
+    overOsc2.connect(overGain);
+    overOsc2.start(overAudioCtx.currentTime + 0.5);
+    overOsc2.stop(overAudioCtx.currentTime + 2.5);
+
+    overOsc = [overOsc1, overOsc2];
+}
+
+function stopOverMusic() {
+    if (overOsc && Array.isArray(overOsc)) {
+        overOsc.forEach(osc => { try { osc.stop(); osc.disconnect(); } catch(e){} });
+        overOsc = null;
+    }
+    if (overGain) { overGain.disconnect(); overGain = null; }
+    if (overAudioCtx) { overAudioCtx.close(); overAudioCtx = null; }
 }
 
 function stopIntroMusic() {
-    if (introOsc) {
-        introOsc.stop();
-        introOsc.disconnect();
+    if (introOsc && Array.isArray(introOsc)) {
+        introOsc.forEach(osc => {
+            try { osc.stop(); osc.disconnect(); } catch(e){}
+        });
         introOsc = null;
     }
     if (introGain) {
@@ -67,6 +166,7 @@ let gameRunning = false;
 let score = 0;
 let animationId;
 let lastTime = 0;
+let lives = 3;
 
 // Inputs
 const keys = {
@@ -436,6 +536,23 @@ function createExplosion(x, y, count, color) {
     }
 }
 
+function updateLivesDisplay() {
+    let el = document.getElementById('lives-board');
+    if (!el) {
+        el = document.createElement('div');
+        el.id = 'lives-board';
+        el.style.position = 'absolute';
+        el.style.top = '20px';
+        el.style.right = '40px';
+        el.style.fontSize = '22px';
+        el.style.color = '#ffd700';
+        el.style.textShadow = '0 0 10px #ffd700';
+        el.style.zIndex = '12';
+        document.body.appendChild(el);
+    }
+    el.innerHTML = `Vidas: ${lives}`;
+}
+
 // --- Game Loop ---
 function loop() {
     if (!gameRunning) return;
@@ -479,8 +596,16 @@ function loop() {
         if (ship.visible && ship.invulnerable <= 0 && dist(ship.x, ship.y, ast.x, ast.y) < ship.radius + ast.radius) {
             createExplosion(ship.x, ship.y, 50, '#0ff');
             ship.visible = false;
-            gameOver();
-            return;
+            lives--;
+            updateLivesDisplay();
+            if (lives > 0) {
+                setTimeout(() => {
+                    ship = new Ship();
+                }, 1200);
+            } else {
+                gameOver();
+                return;
+            }
         }
         for (let j = bullets.length - 1; j >= 0; j--) {
             const b = bullets[j];
@@ -507,9 +632,11 @@ function loop() {
 }
 
 // --- Controle de Jogo ---
-function startGame() {
+window.startGame = function startGame() {
     stopIntroMusic();
-    initAudio();
+        stopOverMusic();
+        playGameMusic();
+        initAudio();
     document.getElementById('start-screen').classList.add('hidden');
     document.getElementById('game-over-screen').classList.add('hidden');
     resetGameVars();
@@ -517,17 +644,21 @@ function startGame() {
     loop();
 }
 
-function resetGame() {
+window.resetGame = function resetGame() {
     document.getElementById('game-over-screen').classList.add('hidden');
     resetGameVars();
     gameRunning = true;
     loop();
+        stopOverMusic();
+        playGameMusic();
 }
 
 function resetGameVars() {
     score = 0;
     level = 1;
+    lives = 3;
     document.getElementById('score').innerText = '0';
+    updateLivesDisplay();
     ship = new Ship();
     bullets = [];
     particles = [];
@@ -541,10 +672,17 @@ function resetGameVars() {
 function gameOver() {
     gameRunning = false;
     cancelAnimationFrame(animationId);
-    setTimeout(() => {
+        stopGameMusic();
+        playOverMusic();
+        setTimeout(() => {
         document.getElementById('final-score').innerText = score;
         document.getElementById('game-over-screen').classList.remove('hidden');
     }, 1000);
+// Garante que a música de introdução para ao iniciar o jogo
+window.addEventListener('DOMContentLoaded', () => {
+    playIntroMusic();
+    document.getElementById('start-screen').addEventListener('click', stopIntroMusic);
+});
 }
 
 // --- Event Listeners ---
